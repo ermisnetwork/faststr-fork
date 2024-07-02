@@ -1,6 +1,6 @@
 [package]
 name = "faststr-fork"
-version = "0.2.21"
+version = "0.2.22"
 authors = ["Volo Team <volo@cloudwego.io>", "dái bò"]
 edition = "2021"
 description = "Faststr is a string library that reduces the cost of clone."
@@ -19,7 +19,7 @@ redis = { version = "0.25", optional = true, default_features = false }
 itoa = { version = "1", optional = true }
 sqlx = { version = "0.7", optional = true }
 [features]
-default = ["std"]
+default = ["std", "sqlx"]
 std = ["serde/std"]
 serde = ["dep:serde"]
 serde-unsafe = ["serde"]
