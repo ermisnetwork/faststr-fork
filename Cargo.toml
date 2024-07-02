@@ -1,6 +1,6 @@
 [package]
 name = "faststr-fork"
-version = "0.2.19"
+version = "0.2.20"
 authors = ["Volo Team <volo@cloudwego.io>", "dái bò"]
 edition = "2021"
 description = "Faststr is a string library that reduces the cost of clone."

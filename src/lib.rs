@@ -570,7 +570,7 @@ impl Repr {
                 return unsafe { Self::new_inline_impl(text) };
             }
         }
-        Self::ArcStr(text.into())
+        Self::ArcString(Arc::new(text.to_string()))
         // Self::Bytes(Bytes::copy_from_slice(text.as_bytes()))
     }
 
