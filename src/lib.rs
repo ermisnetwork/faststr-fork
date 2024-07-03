@@ -2,6 +2,7 @@
 
 use bytes::{Bytes, BytesMut};
 use simdutf8::basic::{from_utf8, Utf8Error};
+use ::sqlx::{Decode, Encode};
 use std::{
     borrow::{Borrow, Cow},
     cmp::Ordering,
@@ -537,6 +538,36 @@ impl From<Cow<'static, str>> for FastStr {
         match val {
             Cow::Borrowed(s) => Self::from_static_str(s),
             Cow::Owned(s) => Self::from_string(s),
+        }
+    }
+}
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Decode)]
+pub enum FastStrOption {
+    Some(FastStr),
+    None,
+}
+
+impl FastStrOption {
+    pub fn unwrap(self) -> FastStr {
+        match self {
+            FastStrOption::Some(s) => s,
+            FastStrOption::None => panic!("called `FastStrOption::unwrap()` on a `None` value"),
+        }
+    }
+    pub fn unwrap_or_else<F: FnOnce() -> FastStr>(self, f: F) -> FastStr {
+        match self {
+            FastStrOption::Some(s) => s,
+            FastStrOption::None => f(),
+        }
+    }
+}
+
+impl From<Option<String>> for FastStrOption {
+    #[inline]
+    fn from(val: Option<String>) -> Self {
+        match val {
+            Some(s) => FastStrOption::Some(FastStr::from(s)),
+            None => FastStrOption::None,
         }
     }
 }
