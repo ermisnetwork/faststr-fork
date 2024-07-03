@@ -541,34 +541,21 @@ impl From<Cow<'static, str>> for FastStr {
         }
     }
 }
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Decode)]
-pub enum FastStrOption {
-    Some(FastStr),
-    None,
-}
+pub struct FastStrOption(Option<FastStr>);
 
-impl FastStrOption {
-    pub fn unwrap(self) -> FastStr {
-        match self {
-            FastStrOption::Some(s) => s,
-            FastStrOption::None => panic!("called `FastStrOption::unwrap()` on a `None` value"),
-        }
-    }
-    pub fn unwrap_or_else<F: FnOnce() -> FastStr>(self, f: F) -> FastStr {
-        match self {
-            FastStrOption::Some(s) => s,
-            FastStrOption::None => f(),
-        }
+impl Deref for FastStrOption {
+    type Target = Option<FastStr>;
+
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
 impl From<Option<String>> for FastStrOption {
     #[inline]
     fn from(val: Option<String>) -> Self {
-        match val {
-            Some(s) => FastStrOption::Some(FastStr::from(s)),
-            None => FastStrOption::None,
-        }
+        Self(val.map(FastStr::from))
     }
 }
 
