@@ -541,6 +541,8 @@ impl From<Cow<'static, str>> for FastStr {
         }
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FastStrOption(Option<FastStr>);
 
 impl Deref for FastStrOption {
