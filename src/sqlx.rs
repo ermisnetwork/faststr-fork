@@ -1,5 +1,8 @@
 
-use sqlx::{database::{HasArguments, HasValueRef}, encode::IsNull, Database, Decode, Encode, Type};
+
+use sqlx::{database::{HasArguments, HasValueRef}, encode::IsNull, postgres::PgArgumentBuffer, sqlite::SqliteArgumentValue, Any, Database, Decode, Encode, MySql, Postgres, Sqlite, Type};
+
+use crate::FastStr;
 
 impl<'r, DB: Database> Decode<'r, DB> for crate::FastStr where String: Decode<'r, DB>{
     fn decode(value: <DB as HasValueRef<'r>>::ValueRef) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
@@ -8,9 +11,28 @@ impl<'r, DB: Database> Decode<'r, DB> for crate::FastStr where String: Decode<'r
     }
 }
 
-impl<'q, DB: Database> Encode<'q, DB> for crate::FastStr where String: Encode<'q, DB>{
-    fn encode_by_ref(&self, buf: &mut <DB as HasArguments<'q>>::ArgumentBuffer) -> IsNull {
-        <String as Encode<DB>>::encode_by_ref(&self.to_string(), buf)
+impl<'q> Encode<'q, Any> for crate::FastStr {
+    fn encode_by_ref(&self, args: &mut <Any as HasArguments<'q>>::ArgumentBuffer) -> IsNull {
+        <String as Encode<Any>>::encode_by_ref(&self.to_string(), args)
+    }
+}
+
+impl<'q> Encode<'q, Sqlite> for crate::FastStr {
+    fn encode_by_ref(&self, args: &mut Vec<SqliteArgumentValue<'q>>) -> IsNull {
+        <String as Encode<Sqlite>>::encode_by_ref(&self.to_string(), args)
+    }
+}
+
+
+impl Encode<'_, Postgres> for FastStr {
+    fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> IsNull {
+        <&str as Encode<Postgres>>::encode(&**self, buf)
+    }
+}
+
+impl Encode<'_, MySql> for FastStr {
+    fn encode_by_ref(&self, buf: &mut Vec<u8>) -> IsNull {
+        <&str as Encode<MySql>>::encode(&**self, buf)
     }
 }
 

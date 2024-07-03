@@ -2,7 +2,6 @@
 
 use bytes::{Bytes, BytesMut};
 use simdutf8::basic::{from_utf8, Utf8Error};
-use ::sqlx::{Decode, Encode};
 use std::{
     borrow::{Borrow, Cow},
     cmp::Ordering,
@@ -300,7 +299,6 @@ impl AsRef<str> for FastStr {
         self.as_str()
     }
 }
-
 impl Deref for FastStr {
     type Target = str;
 
@@ -544,6 +542,12 @@ impl From<Cow<'static, str>> for FastStr {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FastStrOption(Option<FastStr>);
+
+impl FastStrOption {
+    pub fn new(inner: Option<FastStr>) -> Self {
+        Self(inner)
+    }
+}
 
 impl Deref for FastStrOption {
     type Target = Option<FastStr>;
